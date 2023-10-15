@@ -1,0 +1,21 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: servicelb-standalone
+build:
+  artifacts:
+    - image: ghcr.io/samcday/servicelb-standalone
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  helm:
+    releases:
+      - name: servicelb-standalone
+        chartPath: chart
+        valuesFiles:
+          - chart/values.yaml
+        version: 0.1.0
+        setValueTemplates:
+          image:
+            repository: "{{.IMAGE_REPO_ghcr_io_samcday_servicelb_standalone}}"
+            tag: "{{.IMAGE_TAG_ghcr_io_samcday_servicelb_standalone}}@{{.IMAGE_DIGEST_ghcr_io_samcday_servicelb_standalone}}"
