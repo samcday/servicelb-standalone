@@ -53,7 +53,7 @@ type k3s struct {
 
 var _ cloudprovider.Interface = &k3s{}
 
-func init() {
+func Register() {
 	cloudprovider.RegisterCloudProvider("servicelb-standalone", func(config io.Reader) (cloudprovider.Interface, error) {
 		var err error
 		k := k3s{

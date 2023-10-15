@@ -32,12 +32,12 @@ import (
 )
 
 var (
-	finalizerName          = "svccontroller." + "servicelb-standalone" + ".cattle.io/daemonset"
-	svcNameLabel           = "svccontroller." + "servicelb-standalone" + ".cattle.io/svcname"
-	svcNamespaceLabel      = "svccontroller." + "servicelb-standalone" + ".cattle.io/svcnamespace"
-	daemonsetNodeLabel     = "svccontroller." + "servicelb-standalone" + ".cattle.io/enablelb"
-	daemonsetNodePoolLabel = "svccontroller." + "servicelb-standalone" + ".cattle.io/lbpool"
-	nodeSelectorLabel      = "svccontroller." + "servicelb-standalone" + ".cattle.io/nodeselector"
+	finalizerName          = "svccontroller.k3s.cattle.io/daemonset"
+	svcNameLabel           = "svccontroller.k3s.cattle.io/svcname"
+	svcNamespaceLabel      = "svccontroller.k3s.cattle.io/svcnamespace"
+	daemonsetNodeLabel     = "svccontroller.k3s.cattle.io/enablelb"
+	daemonsetNodePoolLabel = "svccontroller.k3s.cattle.io/lbpool"
+	nodeSelectorLabel      = "svccontroller.k3s.cattle.io/nodeselector"
 	controllerName         = ccmapp.DefaultInitFuncConstructors["service"].InitContext.ClientName
 )
 
@@ -485,17 +485,6 @@ func (k *k3s) newDaemonSet(svc *core.Service) (*apps.DaemonSet, error) {
 					},
 					Tolerations: []core.Toleration{
 						{
-							Key:      "node-role.kubernetes.io/master",
-							Operator: "Exists",
-							Effect:   "NoSchedule",
-						},
-						{
-							Key:      "node-role.kubernetes.io/control-plane",
-							Operator: "Exists",
-							Effect:   "NoSchedule",
-						},
-						{
-							Key:      "CriticalAddonsOnly",
 							Operator: "Exists",
 						},
 					},

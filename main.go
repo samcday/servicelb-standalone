@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/samcday/servicelb-standalone/cloudprovider"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/wait"
-	cloudprovider "k8s.io/cloud-provider"
+	cp "k8s.io/cloud-provider"
 	"k8s.io/cloud-provider/app"
 	"k8s.io/cloud-provider/app/config"
 	"k8s.io/cloud-provider/names"
@@ -15,10 +16,13 @@ import (
 )
 
 func main() {
+	cloudprovider.Register()
 	ccmOptions, err := options.NewCloudControllerManagerOptions()
 	if err != nil {
 		klog.Fatalf("unable to initialize command options: %v", err)
 	}
+
+	ccmOptions.Generic.LeaderElection.LeaderElect = false
 
 	fss := cliflag.NamedFlagSets{}
 	command := app.NewCloudControllerManagerCommand(ccmOptions, cloudInitializer, app.DefaultInitFuncConstructors, names.CCMControllerAliases(), fss, wait.NeverStop)
@@ -33,11 +37,11 @@ func main() {
 	}
 }
 
-func cloudInitializer(config *config.CompletedConfig) cloudprovider.Interface {
+func cloudInitializer(config *config.CompletedConfig) cp.Interface {
 	cloudConfig := config.ComponentConfig.KubeCloudShared.CloudProvider
 
 	// initialize cloud provider with the cloud provider name and config file provided
-	cloud, err := cloudprovider.InitCloudProvider(cloudConfig.Name, cloudConfig.CloudConfigFile)
+	cloud, err := cp.InitCloudProvider(cloudConfig.Name, cloudConfig.CloudConfigFile)
 	if err != nil {
 		klog.Fatalf("Cloud provider could not be initialized: %v", err)
 	}
@@ -45,12 +49,5 @@ func cloudInitializer(config *config.CompletedConfig) cloudprovider.Interface {
 		klog.Fatalf("Cloud provider is nil")
 	}
 
-	if !cloud.HasClusterID() {
-		if config.ComponentConfig.KubeCloudShared.AllowUntaggedCloud {
-			klog.Warning("detected a cluster without a ClusterID.  A ClusterID will be required in the future.  Please tag your cluster to avoid any future issues")
-		} else {
-			klog.Fatalf("no ClusterID found.  A ClusterID is required for the cloud provider to function properly.  This check can be bypassed by setting the allow-untagged-cloud option")
-		}
-	}
 	return cloud
 }

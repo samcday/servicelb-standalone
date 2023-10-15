@@ -7,6 +7,8 @@ build:
     - image: ghcr.io/samcday/servicelb-standalone
       docker:
         dockerfile: Dockerfile
+  local:
+    useBuildkit: true
 deploy:
   helm:
     releases:
